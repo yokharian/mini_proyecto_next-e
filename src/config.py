@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 AWS_DEFAULT_REGION = getenv("AWS_DEFAULT_REGION", "us-east-2")
-DYNAMODB_TABLE = getenv("DYNAMODB_TABLE", "openweather_insights_next_e")
+DYNAMODB_TABLE = getenv("DYNAMODB_TABLE", "openweather_nexte")
 LIMIT_OUTPUT = int(getenv("LIMIT_OUTPUT", 8))
 APPID = environ["APPID"]
 
