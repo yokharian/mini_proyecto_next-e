@@ -12,6 +12,11 @@ custom:
   pythonRequirements:
     dockerizePip: non-linux
 
+  LATITUDE: ${param:LATITUDE}
+  LONGITUDE: ${param:LONGITUDE}
+  APPID: ${param:APPID}
+  DYNAMODB_TABLE: openweather_nexte
+
 provider:
   name: aws
   stage: dev # Default stage to be used. Default is "dev"
@@ -21,7 +26,7 @@ provider:
   memorySize: 512 # Overwrite the default memory size. Default is 1024
   timeout: 10 # The default is 6 seconds. Note: API Gateway current maximum is 30 seconds
   environment:
-    DYNAMODB_TABLE: openweather_nexte
+    DYNAMODB_TABLE: ${self:custom.DYNAMODB_TABLE}
   iam:
     role:
       statements: # permissions for all of your functions can be set here
@@ -39,9 +44,9 @@ functions:
     events:
       - schedule: rate(6 hours)
     environment:
-      LATITUDE: ${param:LATITUDE}
-      LONGITUDE: ${param:LONGITUDE}
-      APPID: ${param:APPID}
+      LATITUDE: ${self:custom.LATITUDE}
+      LONGITUDE: ${self:custom.LONGITUDE}
+      APPID: ${self:custom.APPID}
       DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
 
   get_average_forecast:
@@ -50,6 +55,7 @@ functions:
       - http:
           path: openweather/forecast/average
           method: get
+          integration: lambda-proxy
           cors:
             origin: '*'
           request: # configure method request and integration request settings
@@ -59,7 +65,7 @@ functions:
                 date_to: true
             passThrough: NEVER
     environment:
-      DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
+      DYNAMODB_TABLE: ${self:custom.DYNAMODB_TABLE}
 # The "Resources" your "Functions" use.  Raw AWS CloudFormation goes in here.
 resources:
   Resources:
