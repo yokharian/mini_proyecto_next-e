@@ -1,0 +1,49 @@
+org: drapaiton
+app: cron-openweather-extractor
+service: cron-openweather-extractor
+
+frameworkVersion: '2'
+
+
+provider:
+  name: aws
+  stage: dev # Default stage to be used. Default is "dev"
+  region: us-east-2
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  memorySize: 512 # Overwrite the default memory size. Default is 1024
+  timeout: 10 # The default is 6 seconds. Note: API Gateway current maximum is 30 seconds
+
+functions:
+  openweather_updater:
+    handler: synchronizer.run
+    events:
+      - schedule: rate(1 minute)
+  get_average_forecast:
+    handler: endpoints.get_average
+    events:
+      - http:
+          path: hello
+          method: get
+          cors:
+            origin: '*'
+            allowCredentials: true
+        request: # configure method request and integration request settings
+          parameters: # Optional request parameter configuration
+            querystrings:
+              date_from: true
+              date_to: true
+
+# The "Resources" your "Functions" use.  Raw AWS CloudFormation goes in here.
+resources:
+  Resources:
+    Next-eInsights:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: next_e_insights
+        KeySchema:
+          - AttributeName: dt
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 3
+          WriteCapacityUnits: 3
