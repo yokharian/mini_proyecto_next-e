@@ -1421,5 +1421,5 @@ to_migrate = [
 
 if __name__ == '__main__':
     for insight in to_migrate:
-        insight.pop('dt_end')
+        insight['dt'] = insight.pop('dt_end')-3600
         print(OpenWeatherInsight(**insight).put(table=table))

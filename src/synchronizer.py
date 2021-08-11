@@ -3,36 +3,26 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List, Optional
 
-from config import table, LONGITUDE, LATITUDE, logger, DATETIME_FORMAT, LIMIT_OUTPUT
+from config import table, LONGITUDE, LATITUDE, logger, DATETIME_FORMAT, LIMIT_OUTPUT, APPID, DYNAMODB_TABLE
 from models import OpenWeatherInsight
 from openweather_api import OneCallAPI
 
 
 def run(event, context):
-    current_time = datetime.now().time()
-    name = context.function_name
-    logger.info("Your cron function " + name + " ran at " + str(current_time))
-
-    logger.info("context")
-    logger.info(context)
-    logger.info("context")
-
     api = OneCallAPI(latitude=LATITUDE, longitude=LONGITUDE)
     response: List[OpenWeatherInsight] = api.extract_next_48_hours(
         output_limit=LIMIT_OUTPUT
     )
 
     errors = 0
-
     for insight in response:
         try:
-            print(insight.put(table=table))
+            logger.info(insight.put(table=table))
         except Exception as e:
             logger.exception(e)
             errors += 1
             continue
-
-    print(f"\nerrors = {errors} & successfully uploaded {len(response)} items")
+    logger.info(f"\nerrors = {errors} & successfully uploaded {len(response)} items")
 
     date_from: Optional[OpenWeatherInsight] = (
         response.pop(0) if len(response) > 0 else None
@@ -52,4 +42,4 @@ def run(event, context):
     )
     date_to: Optional[str] = date_to.strftime(DATETIME_FORMAT) if date_to else None
 
-    print(f"extracted from {date_from} to {date_to}")
+    logger.info(f"extracted from {date_from} to {date_to}")

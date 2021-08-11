@@ -56,6 +56,7 @@ class OneCallAPI(BaseApi):
 
     def extract_next_48_hours(self, output_limit=6) -> List[OpenWeatherInsight]:
         response = self._request(params=dict(lat=self.latitude, lon=self.longitude))
+        response.raise_for_status()
 
         output: List[OpenWeatherInsight] = []
         for index, hour in enumerate(response.json()["hourly"]):
