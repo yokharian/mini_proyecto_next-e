@@ -12,6 +12,7 @@ custom:
   pythonRequirements:
     dockerizePip: non-linux
 
+  LIMIT_OUTPUT: ${param:LIMIT_OUTPUT}
   LATITUDE: ${param:LATITUDE}
   LONGITUDE: ${param:LONGITUDE}
   APPID: ${param:APPID}
@@ -47,6 +48,7 @@ functions:
       LATITUDE: ${self:custom.LATITUDE}
       LONGITUDE: ${self:custom.LONGITUDE}
       APPID: ${self:custom.APPID}
+      LIMIT_OUTPUT: ${self:custom.LIMIT_OUTPUT}
       DYNAMODB_TABLE: ${self:provider.environment.DYNAMODB_TABLE}
 
   get_average_forecast:

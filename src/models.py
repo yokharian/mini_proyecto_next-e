@@ -6,7 +6,9 @@ from json import dumps
 from typing import List
 
 from boto3.dynamodb.conditions import Key
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+
+from config import logger
 
 ONE_HOUR = 3600
 
@@ -88,17 +90,22 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynam
 
 class LambdaTriggerResponse(BaseModel):
     statusCode: int
-    body: str = Field(default_factory=dumps)
+    body: dict
     isBase64Encoded: bool = False
     headers: dict = {}
+
+    def dict(self):
+        output = {**super().dict(), "body": dumps(super().dict()["body"])}
+        logger.info(output)
+        return output
 
     def to_json(self):
         return dumps(self.dict())
 
 
-class Response400(BaseModel):
+class Response400(LambdaTriggerResponse):
     statusCode: int = 400
 
 
-class Response200(BaseModel):
+class Response200(LambdaTriggerResponse):
     statusCode: int = 200

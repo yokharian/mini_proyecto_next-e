@@ -12,8 +12,8 @@ logger.setLevel(logging.INFO)
 DYNAMODB_TABLE: str = environ["DYNAMODB_TABLE"]
 AWS_DEFAULT_REGION: str = getenv("AWS_DEFAULT_REGION", "us-east-2")
 LIMIT_OUTPUT: int = int(getenv("LIMIT_OUTPUT", 8))
-LATITUDE: float = float(getenv("LATITUDE")) if getenv('LATITUDE') else None
-LONGITUDE: float = float(getenv("LONGITUDE")) if getenv('LONGITUDE') else None
+LATITUDE: float = float(getenv("LATITUDE")) if getenv("LATITUDE") else None
+LONGITUDE: float = float(getenv("LONGITUDE")) if getenv("LONGITUDE") else None
 APPID: str = getenv("APPID")
 
 dynamodb = boto3.resource("dynamodb", region_name=AWS_DEFAULT_REGION)
