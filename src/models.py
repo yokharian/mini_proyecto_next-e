@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
+from json import dumps
 from typing import List
 
 from boto3.dynamodb.conditions import Key
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 ONE_HOUR = 3600
 
@@ -68,12 +69,36 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynam
         return response
 
     @classmethod
-    def read(cls, table, date_from: datetime, date_to: datetime, dt_difference=3600) -> List[OpenWeatherInsight]:
+    def read(
+        cls, table, date_from: datetime, date_to: datetime, dt_difference=3600
+    ) -> List[OpenWeatherInsight]:
         date_from: Decimal = Decimal(date_from.timestamp())
         date_to: Decimal = Decimal(date_to.timestamp())
+
+        # keep date_from the lower in order to keep range logic
+        if date_to < date_from:
+            date_from, date_to = date_to, date_from
 
         _response = table.query(
             KeyConditionExpression=Key("dt").between(date_from, date_to)
             & Key("dt_difference").eq(dt_difference),
         )
-        return [OpenWeatherInsight(**i) for i in _response.get('Items', [])]
+        return [OpenWeatherInsight(**i) for i in _response.get("Items", [])]
+
+
+class LambdaTriggerResponse(BaseModel):
+    statusCode: int
+    body: str = Field(default_factory=dumps)
+    isBase64Encoded: bool = False
+    headers: dict = {}
+
+    def to_json(self):
+        return dumps(self.dict())
+
+
+class Response400(BaseModel):
+    statusCode: int = 400
+
+
+class Response200(BaseModel):
+    statusCode: int = 200
