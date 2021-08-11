@@ -1,31 +1,57 @@
 from datetime import datetime
+from datetime import datetime
 from typing import List
 
 import pandas as pd
 
-from config import logger, table
-from src.models import OpenWeatherInsight
+from config import logger, table, DATETIME_FORMAT
+from src.models import (
+    OpenWeatherInsight,
+    Response400,
+    Response200,
+)
 
 
 def get_average(event, context):
-    # current_time = datetime.now().time()
-    # name = context.function_name
-    # logger.info("Your cron function " + name + " ran at " + str(current_time))
+    date_from = event["queryStringParameters"]["date_from"]
+    date_from = datetime.strptime(date_from, DATETIME_FORMAT)
+
+    date_to = event["queryStringParameters"]["date_to"]
+    date_to = datetime.strptime(date_to, DATETIME_FORMAT)
 
     # TODO add chunk iterator to optimize ram usage & allow bigger date ranges
     # https://math.stackexchange.com/questions/22348/how-to-add-and-subtract-values-from-an-average
-
     response_items: List[OpenWeatherInsight] = OpenWeatherInsight.read(
         table=table,
-        date_from=datetime.fromtimestamp(62862200),
-        date_to=datetime.fromtimestamp(62871560),
+        date_from=date_from,
+        date_to=date_to,
     )
-    columns_to_keep = ["clouds", "dew_point", "feels_like", "humidity", "pop", "pressure", "temp", "uvi", "visibility", "wind_deg","wind_gust", "wind_speed"]
-    df = pd.DataFrame.from_records([i.dict() for i in response_items])
-    output = df[columns_to_keep].describe().to_dict()
-    return output
+    if not response_items:
+        return Response400(body={"error": "not found data for specified dates"}).dict()
 
-
-if __name__ == '__main__':
-    print(get_average('',''))
-
+    try:
+        df = pd.DataFrame.from_records([i.dict() for i in response_items])
+        COLUMNS_TO_KEEP = [
+            "clouds",
+            "dew_point",
+            "feels_like",
+            "humidity",
+            "pop",
+            "pressure",
+            "temp",
+            "uvi",
+            "visibility",
+            "wind_deg",
+            "wind_gust",
+            "wind_speed",
+        ]
+        output = df[COLUMNS_TO_KEEP].describe().to_dict()
+        Response200(body=output).dict()
+    except Exception as e:
+        logger.error(e)
+        Response400(
+            body={
+                "error": f"wrong data found for specified dates save this "
+                f"timestamp for further debug {datetime.now().timestamp()}"
+            }
+        ).dict()
