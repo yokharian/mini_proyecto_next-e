@@ -23,13 +23,8 @@ seleccionados**
 # create a virtual environment & install dependencies
 poetry install
 
-# manually set the following environment variables
-# remember to replace with your own
-DYNAMODB_TABLE = openweather_insights_next_e
-AWS_DEFAULT_REGION = us-east-2
-LONGITUDE = -100.31847
-APPID = 44d621212314
-LATITUDE = 25.6714
+# create a file called .env file or rename the file called sample.env 
+# and use sample.env as a sample to set all environment variables 
 
 # replace python to python3 in bash if 
 # executing 'python --version' is not python 3.x.x

@@ -2,6 +2,12 @@ import logging
 from os import getenv, environ
 
 import boto3
+from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 AWS_DEFAULT_REGION = getenv("AWS_DEFAULT_REGION", "us-east-2")
 DYNAMODB_TABLE = getenv("DYNAMODB_TABLE", "openweather_insights_next_e")
@@ -18,5 +24,3 @@ table = dynamodb.Table(DYNAMODB_TABLE)
 
 DATE_FORMAT = "%Y-%m-%d"
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-logging.basicConfig()
-logger = logging.getLogger("root")
