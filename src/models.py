@@ -1,15 +1,27 @@
-from decimal import Decimal
+from __future__ import annotations
 
+from datetime import datetime
+from decimal import Decimal
+from typing import List
+
+from boto3.dynamodb.conditions import Key
 from pydantic import BaseModel
 
 ONE_HOUR = 3600
 
 
+class WeatherSpecs(BaseModel):
+    description: str
+    icon: str
+    id: int
+    main: str
+
+
 class OpenWeatherInsight(BaseModel):
-    clouds: int
-    dew_point: Decimal
     dt: int
     dt_difference: int = ONE_HOUR
+    clouds: int
+    dew_point: Decimal
     feels_like: Decimal
     humidity: int
     pop: Decimal
@@ -21,13 +33,7 @@ class OpenWeatherInsight(BaseModel):
     wind_gust: Decimal
     wind_speed: Decimal
 
-    class Weather(BaseModel):
-        description: str
-        icon: str
-        id: int
-        main: str
-
-    weather: Weather
+    weather: WeatherSpecs
 
     def put(self, table):
         """\
@@ -40,7 +46,7 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynam
                 "clouds": self.clouds,
                 "dew_point": self.dew_point,
                 "dt": self.dt,
-                "dt_end": self.dt + self.dt_difference,
+                "dt_difference": self.dt_difference,
                 "feels_like": self.feels_like,
                 "humidity": self.humidity,
                 "pop": self.pop,
@@ -60,3 +66,14 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynam
             }
         )
         return response
+
+    @classmethod
+    def read(cls, table, date_from: datetime, date_to: datetime, dt_difference=3600) -> List[OpenWeatherInsight]:
+        date_from: Decimal = Decimal(date_from.timestamp())
+        date_to: Decimal = Decimal(date_to.timestamp())
+
+        _response = table.query(
+            KeyConditionExpression=Key("dt").between(date_from, date_to)
+            & Key("dt_difference").eq(dt_difference),
+        )
+        return [OpenWeatherInsight(**i) for i in _response.get('Items', [])]

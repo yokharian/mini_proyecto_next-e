@@ -7,14 +7,15 @@ from config import table, LONGITUDE, LATITUDE, logger, DATETIME_FORMAT, LIMIT_OU
 from models import OpenWeatherInsight
 from openweather_api import OneCallAPI
 
+
 def run(event, context):
     current_time = datetime.now().time()
     name = context.function_name
     logger.info("Your cron function " + name + " ran at " + str(current_time))
 
-    logger.info('context')
+    logger.info("context")
     logger.info(context)
-    logger.info('context')
+    logger.info("context")
 
     api = OneCallAPI(latitude=LATITUDE, longitude=LONGITUDE)
     response: List[OpenWeatherInsight] = api.extract_next_48_hours(
@@ -31,7 +32,7 @@ def run(event, context):
             errors += 1
             continue
 
-    print(f"\n{errors=} & successfully uploaded {len(response)} items")
+    print(f"\nerrors = {errors} & successfully uploaded {len(response)} items")
 
     date_from: Optional[OpenWeatherInsight] = (
         response.pop(0) if len(response) > 0 else None

@@ -25,9 +25,17 @@ functions:
   openweather_updater:
     handler: src/synchronizer.run
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(6 hours)
+    environment:
+      LATITUDE: 25.6714
+      LONGITUDE: -100.31847
+      APPID: none
+      DYNAMODB_TABLE: openweather_nexte
+      LIMIT_OUTPUT: 8
   get_average_forecast:
     handler: src/endpoints.get_average
+    environment:
+      DYNAMODB_TABLE: openweather_nexte
     events:
       - http:
           path: openweather/forecast/average
