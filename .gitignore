@@ -1,9 +1,11 @@
 # serverless related
 .serverless
-*.pyc
-*.pyo
+/serverless_sdk/
 package-lock.json
 package.json
+/node_modules/
+*.pyc
+*.pyo
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

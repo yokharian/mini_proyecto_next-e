@@ -10,13 +10,13 @@ almacene en DynamoDB.**
 **2. Un script que utilizando Pandas obtenga el promedio de temperatura dentro de los periodos
 seleccionados**
 
-**3.- (EXTRA) Agregar una interfaz para acceder fácilmente al script que obtiene el promedio de temperatura**
+**3.- (EXTRA) Agregar una interfaz online para acceder fácilmente al script que obtiene el promedio de temperatura**
 
 
 # Instructions for first-run
 
-###### if you don't have **POETRY**, install it here https://python-poetry.org/docs/
-###### if you don't have **PYTHON 3**, install it here https://www.python.org/downloads/
+###### if you don't have **POETRY**, install it [here](https://python-poetry.org/docs/)
+###### if you don't have **PYTHON 3**, install it [here](https://www.python.org/downloads/)
 ###### if you don't know how to set **ENVIRONMENT VARIABLES**, follow this tutorial for [Windows 10](https://docs.oracle.com/en/database/oracle/machine-learning/oml4r/1.5.1/oread/creating-and-modifying-environment-variables-on-windows.html#GUID-DD6F9982-60D5-48F6-8270-A27EC53807D0)
 
 ```bash
@@ -35,7 +35,17 @@ python src/main.py
 
 # Developers
 
-to sync poetry & requirements.txt _(which natively is used in lambda)_ use the follow command
+### To deploy
+
+###### if you don't have **SERVERLESS**, install it [here](https://www.serverless.com/framework/docs/getting-started/)
+###### if you don't have **NODE**, install it [here](https://nodejs.org/es/)
+###### if you don't have **NPM**, install it [here](https://nodejs.org/es/download/package-manager/)
+###### if you don't have **PYTHON 3.7**, install it [here](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/)
+
 ```bash
-poetry export -f requirements.txt --output requirements.txt
+# make sure you got all plugins installed and python in version 3.7
+serverless plugin install -n serverless-python-requirements
+
+# you need to ask access to aws cloud, contact your administrator
+sls deploy
 ```

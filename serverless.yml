@@ -1,49 +1,63 @@
 org: drapaiton
-app: cron-openweather-extractor
-service: cron-openweather-extractor
+app: openweather-app
+service: openweather-insights
 
 frameworkVersion: '2'
+useDotenv: true
+configValidationMode: error
 
+plugins:
+  - serverless-python-requirements
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
 
 provider:
   name: aws
   stage: dev # Default stage to be used. Default is "dev"
   region: us-east-2
-  runtime: python3.8
+  runtime: python3.7
   lambdaHashingVersion: 20201221
   memorySize: 512 # Overwrite the default memory size. Default is 1024
   timeout: 10 # The default is 6 seconds. Note: API Gateway current maximum is 30 seconds
 
 functions:
   openweather_updater:
-    handler: synchronizer.run
+    handler: src/synchronizer.run
     events:
       - schedule: rate(1 minute)
   get_average_forecast:
-    handler: endpoints.get_average
+    handler: src/endpoints.get_average
     events:
       - http:
-          path: hello
+          path: openweather/forecast/average
           method: get
           cors:
             origin: '*'
-            allowCredentials: true
-        request: # configure method request and integration request settings
-          parameters: # Optional request parameter configuration
-            querystrings:
-              date_from: true
-              date_to: true
+          request: # configure method request and integration request settings
+            parameters: # Optional request parameter configuration
+              querystrings:
+                date_from: true
+                date_to: true
+            passThrough: NEVER
 
 # The "Resources" your "Functions" use.  Raw AWS CloudFormation goes in here.
 resources:
   Resources:
-    Next-eInsights:
+    openweatherNexte:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: next_e_insights
-        KeySchema:
+        TableName: openweather_nexte
+        AttributeDefinitions:
+          - AttributeName: dt_difference
+            AttributeType: N
           - AttributeName: dt
+            AttributeType: N
+        KeySchema:
+          - AttributeName: dt_difference
             KeyType: HASH
+          - AttributeName: dt
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 3
           WriteCapacityUnits: 3
