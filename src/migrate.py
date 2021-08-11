@@ -1419,8 +1419,7 @@ to_migrate = [
     },
 ]
 
-
-for insight in to_migrate:
-    insight.pop('dt_end')
-    insight['dt_difference'] = 3600
-    print(OpenWeatherInsight(**insight).put(table=table))
+if __name__ == '__main__':
+    for insight in to_migrate:
+        insight.pop('dt_end')
+        print(OpenWeatherInsight(**insight).put(table=table))
