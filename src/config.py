@@ -9,15 +9,12 @@ load_dotenv()  # take environment variables from .env.
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-AWS_DEFAULT_REGION: str = getenv("AWS_DEFAULT_REGION", "us-east-2")
 DYNAMODB_TABLE: str = environ["DYNAMODB_TABLE"]
+AWS_DEFAULT_REGION: str = getenv("AWS_DEFAULT_REGION", "us-east-2")
 LIMIT_OUTPUT: int = int(getenv("LIMIT_OUTPUT", 8))
+LATITUDE: float = float(getenv("LATITUDE"))
+LONGITUDE: float = float(getenv("LONGITUDE"))
 APPID: str = getenv("APPID")
-
-monterrey_latitude = 25.6714
-monterrey_longitude = -100.31847
-LATITUDE: float = float(getenv("LATITUDE", monterrey_latitude))
-LONGITUDE: float = float(getenv("LONGITUDE", monterrey_longitude))
 
 dynamodb = boto3.resource("dynamodb", region_name=AWS_DEFAULT_REGION)
 table = dynamodb.Table(DYNAMODB_TABLE)
